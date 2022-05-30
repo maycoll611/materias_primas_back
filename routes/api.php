@@ -9,6 +9,7 @@ use App\Http\Controllers\Login_controller;
 Use App\Http\Controllers\Empresas_controller;
 Use App\Http\Controllers\Guias_controller;
 Use App\Http\Controllers\Usuarios_controller;
+Use App\Http\Controllers\Preguntas_controller;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -39,12 +40,17 @@ Route::get('/transportistas',[Empresas_controller::class,'get_transportistas']);
 Route::post('/conductores_carros',[Empresas_controller::class,'get_conductores_carros']);
 Route::post('/guardar_carro_nuevo',[Empresas_controller::class,'guardar_carro_nuevo']);
 Route::post('/guardar_conductor_nuevo',[Empresas_controller::class,'guardar_conductor_nuevo']);
-Route::post('/guardar_guia',[Guias_controller::class,'guardar_guia']);
+Route::post('/guardar_documento',[Guias_controller::class,'guardar_documento']);
+Route::post('/generar_guia',[Guias_controller::class,'generar_guia']);
 Route::post('/get_guias',[Guias_controller::class,'get_guias']);
-Route::post('/get_guias_correlativo',[Guias_controller::class,'get_guias_correlativo']);
+Route::get('/export_get_guias',[Guias_controller::class,'export_get_guias']);
+Route::post('/get_guias_id',[Guias_controller::class,'get_guias_id']);
 Route::post('/get_usuarios',[Usuarios_controller::class,'get_usuarios']);
 Route::post('/anular_guia',[Guias_controller::class,'anular_guia']);
 Route::post('/login',[Login_controller::class,'verificar']);
+Route::post('/cerrar_sesion',[Login_controller::class,'cerrar_sesion']);
+Route::get('/get_preguntas',[Preguntas_controller::class,'get_preguntas']);
+Route::post('/asignar_transportista',[Guias_controller::class,'asignar_transportista']);
 // Route::middleware('prueba1:api')->get('/usuarios',[User_controller::class, 'index']);
 
 // Route::middleware(['prueba1'])->group(function () {

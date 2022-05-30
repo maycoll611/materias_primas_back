@@ -26,7 +26,7 @@ class Login_controller extends Controller
      */
     public function verificar(Request $request){
         $consulta = DB::table('usuarios')
-        ->select(['usuario_id','usuario_nombre','api_token','usuario_detalle_nombre','usuario_correo','usuario_area'])
+        ->select(['usuario_id','usuario_nombre','api_token','usuario_detalle_nombre','usuario_correo','usuario_area','usuario_cargo'])
         ->where('usuario_nombre',$request->usuario_nombre)
         ->where('usuario_pw',$request->usuario_pw)
         ->get();
