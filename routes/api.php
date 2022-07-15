@@ -10,6 +10,7 @@ Use App\Http\Controllers\Empresas_controller;
 Use App\Http\Controllers\Guias_controller;
 Use App\Http\Controllers\Usuarios_controller;
 Use App\Http\Controllers\Preguntas_controller;
+Use App\Http\Controllers\Inventarios_controller;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -51,6 +52,11 @@ Route::post('/login',[Login_controller::class,'verificar']);
 Route::post('/cerrar_sesion',[Login_controller::class,'cerrar_sesion']);
 Route::get('/get_preguntas',[Preguntas_controller::class,'get_preguntas']);
 Route::post('/asignar_transportista',[Guias_controller::class,'asignar_transportista']);
+
+Route::post('/consultar_codigo',[Inventarios_controller::class,'consultar_codigo']);
+Route::post('/get_almacenes_racks',[Inventarios_controller::class,'get_almacenes_racks']);
+
+
 // Route::middleware('prueba1:api')->get('/usuarios',[User_controller::class, 'index']);
 
 // Route::middleware(['prueba1'])->group(function () {
