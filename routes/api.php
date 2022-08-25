@@ -49,6 +49,10 @@ Route::post('/get_guias_id',[Guias_controller::class,'get_guias_id']);
 Route::post('/get_usuarios',[Usuarios_controller::class,'get_usuarios']);
 Route::post('/anular_guia',[Guias_controller::class,'anular_guia']);
 Route::post('/login',[Login_controller::class,'verificar']);
+
+Route::post('/login_1',[Login_controller::class,'verificar_1']);
+Route::post('/crear_usuario',[Login_controller::class,'crear_usuario']);
+
 Route::post('/cerrar_sesion',[Login_controller::class,'cerrar_sesion']);
 Route::get('/get_preguntas',[Preguntas_controller::class,'get_preguntas']);
 Route::post('/asignar_transportista',[Guias_controller::class,'asignar_transportista']);
