@@ -28,6 +28,12 @@ class Inventarios_controller extends Controller
 
     public function consultar_codigo(Request $request){
         $array=[];
+
+        $resp= DB::table('inv_2022_1')
+                ->select("*")
+                ->where('material','=',$request->material)
+                ->get();
+
         $resp1= DB::table('inv_cinthia_2021_2')
                 ->select("*")
                 ->where('material','=',$request->material)
@@ -42,7 +48,11 @@ class Inventarios_controller extends Controller
                 ->select("*")
                 ->where('material','=',$request->material)
                 ->get();
-       
+            
+        if(!empty($resp) && sizeof($resp) != 0 ){
+            array_push($array,$resp);   
+            
+        }
         if(!empty($resp1) && sizeof($resp1) != 0 ){
             array_push($array,$resp1);
             
