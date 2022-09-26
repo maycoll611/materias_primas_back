@@ -11,6 +11,8 @@ Use App\Http\Controllers\Guias_controller;
 Use App\Http\Controllers\Usuarios_controller;
 Use App\Http\Controllers\Preguntas_controller;
 Use App\Http\Controllers\Inventarios_controller;
+Use App\Http\Controllers\Checklist_controller;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -48,7 +50,15 @@ Route::get('/export_get_guias',[Guias_controller::class,'export_get_guias']);
 Route::post('/get_guias_id',[Guias_controller::class,'get_guias_id']);
 Route::post('/get_usuarios',[Usuarios_controller::class,'get_usuarios']);
 Route::post('/anular_guia',[Guias_controller::class,'anular_guia']);
+
+//rutas para equipo_movil get_checklist_vacio
 Route::post('/login',[Login_controller::class,'verificar']);
+Route::post('/get_checklist_vacio',[Checklist_controller::class,'get_checklist_vacio']);
+Route::post('/get_equipos',[Checklist_controller::class,'get_equipos']);
+Route::post('/guardar_checklist',[Checklist_controller::class,'guardar_checklist']);
+Route::post('/get_checklist',[Checklist_controller::class,'get_checklist']);
+Route::get('/export_get_checklist',[Checklist_controller::class,'export_get_checklist']);
+
 
 Route::post('/login_1',[Login_controller::class,'verificar_1']);
 Route::post('/crear_usuario',[Login_controller::class,'crear_usuario']);
