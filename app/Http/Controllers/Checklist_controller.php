@@ -6,10 +6,18 @@ use Illuminate\Http\Request;
 use DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\Ventas_export;
+use Http;
 
 class Checklist_controller extends Controller
 
 {
+    public function consultar_dni(Request $request){
+
+        $resp1 = Http::get('https://api.apis.net.pe/v1/dni?numero='.$request->dni);
+            $resp["datos"] = $resp1->json();
+            return ($resp);
+    }
+
     public function export_get_checklist(){
         return Excel::download(new Ventas_export, 'Descarga.xlsx');
     }

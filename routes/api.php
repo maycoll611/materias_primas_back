@@ -58,6 +58,7 @@ Route::post('/get_equipos',[Checklist_controller::class,'get_equipos']);
 Route::post('/guardar_checklist',[Checklist_controller::class,'guardar_checklist']);
 Route::post('/get_checklist',[Checklist_controller::class,'get_checklist']);
 Route::get('/export_get_checklist',[Checklist_controller::class,'export_get_checklist']);
+Route::get('/consultar_dni',[Checklist_controller::class,'consultar_dni']);
 
 
 Route::post('/login_1',[Login_controller::class,'verificar_1']);
