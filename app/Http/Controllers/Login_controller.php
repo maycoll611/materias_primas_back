@@ -25,57 +25,58 @@ class Login_controller extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function verificar_1(Request $request){
-        $consulta = DB::table('usuarios_r')
-        ->select('*')
-        ->where('usuario_nombre',$request->usuario_nombre)
-        ->where('usuario_pw',$request->usuario_pw)
-        ->get();
-        // if(sizeof($consulta) === 1){
-        //     $token = Str::random(50);
-        //     DB::table('usuarios')
-        //     ->where('usuario_id',$consulta[0]->usuario_id)
-        //     ->update(['api_token' => $token]);
-        //     $consulta[0]->api_token = $token;
-        // }
-           $respuesta['cantidad']=sizeof($consulta);
-           $respuesta['resp']=$consulta;
-           return $respuesta;
-    }
+    // public function verificar_1(Request $request){
+    //     $consulta = DB::table('usuarios_r')
+    //     ->select('*')
+    //     // ->where('usuario_nombre',$request->usuario_nombre)
+    //     ->where('usuario_dni',$request->usuario_dni)
+    //     ->where('usuario_pw',$request->usuario_pw)
+    //     ->get();
+    //     // if(sizeof($consulta) === 1){
+    //     //     $token = Str::random(50);
+    //     //     DB::table('usuarios')
+    //     //     ->where('usuario_id',$consulta[0]->usuario_id)
+    //     //     ->update(['api_token' => $token]);
+    //     //     $consulta[0]->api_token = $token;
+    //     // }
+    //        $respuesta['cantidad']=sizeof($consulta);
+    //        $respuesta['resp']=$consulta;
+    //        return $respuesta;
+    // }
 
-    public function crear_usuario(Request $request){
-        DB::beginTransaction();
-        try {
-            $dataa = [
-                'usuario_nombre'=>$request->usuario_nombre,
-                'usuario_pw'=>$request->usuario_pw,
-                'usuario_correo'=>$request->usuario_correo,
-                'color'=> $request->color
-            ];
-            DB::table('usuarios_r')
-            ->insert($dataa);
+    // public function crear_usuario(Request $request){
+    //     DB::beginTransaction();
+    //     try {
+    //         $dataa = [
+    //             'usuario_nombre'=>$request->usuario_nombre,
+    //             'usuario_pw'=>$request->usuario_pw,
+    //             'usuario_correo'=>$request->usuario_correo,
+    //             'color'=> $request->color
+    //         ];
+    //         DB::table('usuarios_r')
+    //         ->insert($dataa);
 
-            DB::commit();
-            $message = 'Guardado.';
-            $status = true;
-        } catch (\Throwable $th) {
-            DB::rollback();
-            $message = $th;
-            $status = false;
-        }
+    //         DB::commit();
+    //         $message = 'Guardado.';
+    //         $status = true;
+    //     } catch (\Throwable $th) {
+    //         DB::rollback();
+    //         $message = $th;
+    //         $status = false;
+    //     }
 
-        $response["status"] = $status;
-        $response["message"] = $message;
+    //     $response["status"] = $status;
+    //     $response["message"] = $message;
         
         
-        // $response = $request;
-        return $response;
-    }
+    //     // $response = $request;
+    //     return $response;
+    // }
 
     public function verificar(Request $request){
         $consulta = DB::table('usuarios')
-        ->select(['usuario_id','usuario_nombre','api_token','usuario_detalle_nombre','usuario_correo','usuario_area','usuario_cargo'])
-        ->where('usuario_nombre',$request->usuario_nombre)
+        ->select(['usuario_id','api_token','usuario_detalle_nombre','usuario_correo','usuario_area','usuario_cargo','usuario_dni'])
+        ->where('usuario_dni',$request->usuario_dni)
         ->where('usuario_pw',$request->usuario_pw)
         ->get();
         if(sizeof($consulta) === 1){

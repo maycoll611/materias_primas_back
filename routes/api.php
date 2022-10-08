@@ -54,11 +54,14 @@ Route::post('/anular_guia',[Guias_controller::class,'anular_guia']);
 //rutas para equipo_movil get_checklist_vacio
 Route::post('/login',[Login_controller::class,'verificar']);
 Route::post('/get_checklist_vacio',[Checklist_controller::class,'get_checklist_vacio']);
+Route::post('/get_checklist_id',[Checklist_controller::class,'get_checklist_id']);
 Route::post('/get_equipos',[Checklist_controller::class,'get_equipos']);
 Route::post('/guardar_checklist',[Checklist_controller::class,'guardar_checklist']);
 Route::post('/get_checklist',[Checklist_controller::class,'get_checklist']);
 Route::get('/export_get_checklist',[Checklist_controller::class,'export_get_checklist']);
 Route::get('/consultar_dni',[Checklist_controller::class,'consultar_dni']);
+Route::post('/autorizar_checklist',[Checklist_controller::class,'autorizar_checklist']);
+
 
 
 Route::post('/login_1',[Login_controller::class,'verificar_1']);

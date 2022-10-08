@@ -21,6 +21,26 @@ class Checklist_controller extends Controller
     public function export_get_checklist(){
         return Excel::download(new Ventas_export, 'Descarga.xlsx');
     }
+    public function autorizar_checklist(Request $request){
+        
+        try{
+            $affected = DB::table('checklist')
+            ->where('checklist_id',$request->checklist_id)
+            ->update(
+                [   
+                    'checklist_usuario_id_autoriza'=>$request->usuario_autorizante,
+                    'checklist_autorizado'=>'1'
+                ]
+            );
+            $resp['affected'] = $affected;
+            $resp['status'] = true;
+        } catch (\Throwable $th){
+            $resp['error'] = $th;
+            $resp['status'] = false;
+        }
+        return $resp;
+    }
+
     public function get_equipos(Request $request){
         $resp = DB::table('equipos')
                 ->select('*')
@@ -28,6 +48,39 @@ class Checklist_controller extends Controller
         return $resp;
     }
 
+    public function get_checklist_id(Request $request){
+        $resp=DB::table('checklist')
+        ->join('equipos','checklist.checklist_equipo','=','equipos.equipo_id')
+        ->join('usuarios','checklist.checklis_usuario_id','=','usuarios.usuario_id')
+        ->select(
+                "checklist.*", 
+                "checklist.checklist_id", 
+                "checklist.checklis_usuario_id",
+                "checklist.checklist_equipo" ,
+                "checklist.checklist_fecha_hora" ,
+                "checklist.checklist_kilom_inicial" ,
+                "checklist.checklist_kilom_final" ,
+                "checklist.checklist_turno" ,
+                "checklist.checklist_autorizado" ,
+                "checklist.checklist_usuario_id_autoriza",
+                "checklist.checklist_estado",
+                "usuarios.usuario_detalle_nombre",
+                "equipos.equipo_descripcion",
+                "equipos.equipo_placa",
+                "equipos.equipo_modelo",
+                "equipos.equipo_serie",
+                "equipos.equipo_año",
+                "equipos.equipo_tipo");
+        
+        
+      
+        $resp=$resp->where('checklist.checklist_id',$request->checklist_id);
+        
+        $resp = $resp->get();
+        $resp1 = [];
+
+        return json_decode($resp);
+    }
     public function get_checklist_vacio(Request $request){
         $resp = DB::table('elementos_checklist')
                     ->select('*')
@@ -58,8 +111,8 @@ class Checklist_controller extends Controller
         if(isset($request->desde)&&isset($request->hasta)){
             $resp=$resp->whereBetween('checklist_fecha_hora',[$request->desde,$request->hasta.' 23:59:00']);
         }
-        if(isset($request->usuario_area)){
-            $resp=$resp->whereIn('usuarios.usuario_id',$request->usuario_id);
+        if($request->usuario_cargo != 'administrador'){
+            $resp=$resp->where('checklist.checklis_usuario_id',$request->usuario_id);
         }
         $resp = $resp->get();
 
@@ -191,8 +244,8 @@ class Checklist_controller extends Controller
                 "checklist_kilom_inicial"=> $request->cabecera['equipo_kminicial'] ,
                 "checklist_kilom_final"=> $request->cabecera['equipo_kmfinal'] ,
                 "checklist_turno"=> $request->cabecera['turno'] ,
-                "checklist_autorizado" => true,
-                "checklist_usuario_id_autoriza"=> $request->cabecera['usuario_id'],
+                "checklist_autorizado" => false,
+                "checklist_usuario_id_autoriza"=> '',
                 "checklist_estado" => true,
                 "check_1"  =>empty( $request->cuerpo[0]['valor'])?'': $request->cuerpo[0]['valor'],
                 "check_2"  =>empty( $request->cuerpo[1]['valor'])?'': $request->cuerpo[1]['valor'],
