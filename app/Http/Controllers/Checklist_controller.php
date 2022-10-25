@@ -43,8 +43,14 @@ class Checklist_controller extends Controller
 
     public function get_equipos(Request $request){
         $resp = DB::table('equipos')
-                ->select('*')
-                ->get();
+                ->select('*');
+            if($request->equipo_categoria == 'TODOS LOS EQUIPOS'){
+                $resp = $resp->get();
+            }else{
+                $resp=$resp->where('equipo_categoria',$request->equipo_categoria);
+                $resp = $resp->get();
+            }
+
         return $resp;
     }
 
@@ -111,9 +117,13 @@ class Checklist_controller extends Controller
         if(isset($request->desde)&&isset($request->hasta)){
             $resp=$resp->whereBetween('checklist_fecha_hora',[$request->desde,$request->hasta.' 23:59:00']);
         }
-        if($request->usuario_cargo != 'administrador'){
+        if($request->usuario_cargo == 'empleado'){
             $resp=$resp->where('checklist.checklis_usuario_id',$request->usuario_id);
         }
+        if($request->usuario_cargo == 'administrador'){
+            $resp=$resp->where('usuarios.usuario_area',$request->usuario_area);
+        }
+        
         $resp = $resp->get();
 
         return $resp;
