@@ -61,8 +61,14 @@ Route::post('/get_checklist',[Checklist_controller::class,'get_checklist']);
 Route::get('/export_get_checklist',[Checklist_controller::class,'export_get_checklist']);
 Route::get('/consultar_dni',[Checklist_controller::class,'consultar_dni']);
 Route::post('/autorizar_checklist',[Checklist_controller::class,'autorizar_checklist']);
-
-
+Route::post('/get_categorias',[Checklist_controller::class,'get_categorias']);
+Route::post('/guardar_configuracion',[Checklist_controller::class,'guardar_configuracion']);
+Route::post('/get_config_categorias_elementos',[Checklist_controller::class,'get_config_categorias_elementos']);
+Route::post('/get_config_categoria_id',[Checklist_controller::class,'get_config_categoria_id']);
+Route::post('/buscar_usuario_dni',[Checklist_controller::class,'buscar_usuario_dni']);
+Route::post('/guardar_configuracion_usuario',[Checklist_controller::class,'guardar_configuracion_usuario']);
+Route::post('/login_qr',[Login_controller::class,'verificar_codeqr']);
+Route::post('/guardar_km_final',[Checklist_controller::class,'guardar_km_final']);
 
 Route::post('/login_1',[Login_controller::class,'verificar_1']);
 Route::post('/crear_usuario',[Login_controller::class,'crear_usuario']);

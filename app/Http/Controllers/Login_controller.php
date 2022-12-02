@@ -73,6 +73,39 @@ class Login_controller extends Controller
     //     return $response;
     // }
 
+    public function verificar_codeqr(Request $request){
+        $consulta = DB::table('usuarios')
+        ->select(['usuario_id','api_token','usuario_detalle_nombre','usuario_correo','usuario_area','usuario_cargo','usuario_dni'])
+        ->where('codigo_qr',$request->qr)
+        ->get();
+        if(sizeof($consulta) === 1){
+            $token = Str::random(50);
+            DB::table('usuarios')
+            ->where('usuario_id',$consulta[0]->usuario_id)
+            ->update(['api_token' => $token]);
+            $consulta[0]->api_token = $token;
+        }
+           $respuesta['cantidad']=sizeof($consulta);
+           $respuesta['resp']=$consulta;
+           return $respuesta;
+
+        // $usuarios = DB::table('usuarios')
+        // ->select(['usuario_id','usuario_pw','api_token','usuario_detalle_nombre','usuario_correo','usuario_area','usuario_cargo','usuario_dni'])
+        // ->get();
+        // $Array_nuevo = [];
+        // foreach ($usuarios as  $value) {
+        //     $temp = '';
+        //     $temp = $value->usuario_id.$value->usuario_dni.$value->usuario_pw;
+        //     $temp = password_hash($temp, PASSWORD_DEFAULT, [200]);;
+        //     $affected = DB::table('usuarios')
+        //     ->where('usuario_id',$value->usuario_id)
+        //     ->update(['codigo_qr' => $temp]);
+
+        //     array_push($Array_nuevo,$affected);
+        // }
+        // var_dump($Array_nuevo);
+    }
+
     public function verificar(Request $request){
         $consulta = DB::table('usuarios')
         ->select(['usuario_id','api_token','usuario_detalle_nombre','usuario_correo','usuario_area','usuario_cargo','usuario_dni'])
@@ -90,6 +123,7 @@ class Login_controller extends Controller
            $respuesta['resp']=$consulta;
            return $respuesta;
     }
+
     public function cerrar_sesion(Request $request)
     {
         try{

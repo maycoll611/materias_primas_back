@@ -76,7 +76,8 @@ class Checklist_controller extends Controller
                 "equipos.equipo_modelo",
                 "equipos.equipo_serie",
                 "equipos.equipo_año",
-                "equipos.equipo_tipo");
+                "equipos.equipo_tipo",
+                "equipos.equipo_categoria_id");
         
         
       
@@ -91,6 +92,13 @@ class Checklist_controller extends Controller
         $resp = DB::table('elementos_checklist')
                     ->select('*')
                     ->get();
+        return $resp;
+    }
+    public function buscar_usuario_dni(Request $request){
+        $resp = DB::table('usuarios')
+                    ->select('*')
+                    ->where('usuario_dni',"=",$request->dni)
+                    ->first();
         return $resp;
     }
     public function get_checklist(Request $request){
@@ -111,7 +119,8 @@ class Checklist_controller extends Controller
                 "usuarios.usuario_detalle_nombre",
                 "equipos.equipo_descripcion",
                 "equipos.equipo_placa",
-                "equipos.equipo_tipo")
+                "equipos.equipo_tipo",
+                "equipos.equipo_ubicacion")
         ->orderBy('checklist.checklist_id', 'desc');
         
         if(isset($request->desde)&&isset($request->hasta)){
@@ -128,6 +137,110 @@ class Checklist_controller extends Controller
 
         return $resp;
     }
+    public  function guardar_configuracion_usuario(Request $request){
+         date_default_timezone_set('America/Lima');
+         $data = ['usuario_cargo' => $request->data_config['usuario_cargo'],
+                    'usuario_update' => date('Y-m-d H:i:s'),
+                    'usuario_area' => $request->data_config['usuario_area']];
+        DB::beginTransaction();
+        try {
+                $affected = DB::table('usuarios')
+                ->where('usuario_id',$request->data_config['usuario_id'])
+                ->update($data);
+            DB::commit();
+            $resp['affected'] = $affected;
+            $resp['status'] = true;
+            
+        }catch(\Throwable $th){
+            DB::rollback();
+            
+            $resp['status'] = $th;
+
+        }
+           
+        return $resp;
+    }
+
+
+    public  function guardar_configuracion(Request $request){
+        $data = $request->data_config;
+        DB::beginTransaction();
+        $contador = 0;
+        date_default_timezone_set('America/Lima');
+        try {
+            
+            foreach ($data as $value) {
+                $affected = DB::table('categorias_elementos')
+                ->where('ce_id',$value['ce_id'])
+                ->update(['ce_valor' => $value['ce_valor'],
+                            'ce_ultimo_cambio' => date('Y-m-d H:i:s'),
+                                'ce_usuario_id' => $request->usuario['usuario_id']]);
+                            $contador++;
+            }
+            DB::commit();
+            $resp['affected'] = $contador;
+            $resp['status'] = true;
+            
+        }catch(\Throwable $th){
+            DB::rollback();
+            $resp['affected'] = $contador;
+            $resp['status'] = false;
+
+        }
+           
+        return $resp;
+    }
+    public function get_config_categorias_elementos(Request $request){
+        try {
+            $resp = DB::table('categorias_elementos')
+                ->select('*')
+                ->get();
+        } catch (\Throwable $th) {
+            $resp =  $th;
+        }
+
+        return $resp;
+    }
+
+    public function get_categorias(Request $request){
+        try {
+            $resp = DB::table('categorias')
+                ->select('*')
+                ->get();
+        } catch (\Throwable $th) {
+            $resp =  $th;
+        }
+        
+        return $resp;
+    }
+    public function guardar_km_final(Request $request){
+
+        try{
+            $affected = DB::table('checklist')
+            ->where('checklist_id',$request->checklist_id)
+            ->update(['checklist_kilom_final'=>$request->kilom_final]);
+
+            $resp['affected'] = $affected;
+            $resp['status'] = true;
+        } catch (\Throwable $th){
+            $resp['error'] = $th;
+            $resp['status'] = false;
+        }
+        return $resp;
+    }
+
+   public function get_config_categoria_id(Request $request){
+    try {
+        $resp = DB::table('categorias_elementos')
+            ->select('*')
+            ->where('ce_categoria_id','=',$request->categoria_id)
+            ->get();
+    } catch (\Throwable $th) {
+        $resp =  $th;
+    }
+    
+    return $resp;
+   }
 
     public function get_guias_id(Request $request){
         try{    
@@ -246,87 +359,28 @@ class Checklist_controller extends Controller
     }
     public function guardar_checklist(Request $request){
 
-            $data = [ 
-                
-                "checklis_usuario_id"=> $request->cabecera['usuario_id'],
-                "checklist_equipo"=> $request->cabecera['equipo_id'] ,
-                "checklist_fecha_hora"=> $request->cabecera['fecha'] ,
-                "checklist_kilom_inicial"=> $request->cabecera['equipo_kminicial'] ,
-                "checklist_kilom_final"=> $request->cabecera['equipo_kmfinal'] ,
-                "checklist_turno"=> $request->cabecera['turno'] ,
-                "checklist_autorizado" => false,
-                "checklist_usuario_id_autoriza"=> '',
-                "checklist_estado" => true,
-                "check_1"  =>empty( $request->cuerpo[0]['valor'])?'': $request->cuerpo[0]['valor'],
-                "check_2"  =>empty( $request->cuerpo[1]['valor'])?'': $request->cuerpo[1]['valor'],
-                "check_3"  =>empty( $request->cuerpo[2]['valor'])?'': $request->cuerpo[2]['valor'],
-                "check_4"  =>empty( $request->cuerpo[3]['valor'])?'': $request->cuerpo[3]['valor'],
-                "check_5"  =>empty( $request->cuerpo[4]['valor'])?'': $request->cuerpo[4]['valor'],
-                "check_6"  =>empty( $request->cuerpo[5]['valor'])?'': $request->cuerpo[5]['valor'],
-                "check_7"  =>empty( $request->cuerpo[6]['valor'])?'': $request->cuerpo[6]['valor'],
-                "check_8"  =>empty( $request->cuerpo[7]['valor'])?'': $request->cuerpo[7]['valor'],
-                "check_9"  =>empty( $request->cuerpo[8]['valor'])?'': $request->cuerpo[8]['valor'],
-                "check_10"  =>empty($request->cuerpo[9]['valor'])?'':$request->cuerpo[9]['valor'],
-                "check_11"  =>empty($request->cuerpo[10]['valor'])?'':$request->cuerpo[10]['valor'],
-                "check_12"  =>empty($request->cuerpo[11]['valor'])?'':$request->cuerpo[11]['valor'],
-                "check_13"  =>empty($request->cuerpo[12]['valor'])?'':$request->cuerpo[12]['valor'],
-                "check_14"  =>empty($request->cuerpo[13]['valor'])?'':$request->cuerpo[13]['valor'],
-                "check_15"  =>empty($request->cuerpo[14]['valor'])?'':$request->cuerpo[14]['valor'],
-                "check_16"  =>empty($request->cuerpo[15]['valor'])?'':$request->cuerpo[15]['valor'],
-                "check_17"  =>empty($request->cuerpo[16]['valor'])?'':$request->cuerpo[16]['valor'],
-                "check_18"  =>empty($request->cuerpo[17]['valor'])?'':$request->cuerpo[17]['valor'],
-                "check_19"  =>empty($request->cuerpo[18]['valor'])?'':$request->cuerpo[18]['valor'],
-                "check_20"  =>empty($request->cuerpo[19]['valor'])?'':$request->cuerpo[19]['valor'],
-                "check_21"  =>empty($request->cuerpo[20]['valor'])?'':$request->cuerpo[20]['valor'],
-                "check_22"  =>empty($request->cuerpo[21]['valor'])?'':$request->cuerpo[21]['valor'],
-                "check_23"  =>empty($request->cuerpo[22]['valor'])?'':$request->cuerpo[22]['valor'],
-                "check_24"  =>empty($request->cuerpo[23]['valor']) ? '':$request->cuerpo[23]['valor'],
-                "check_25"  =>empty($request->cuerpo[24]['valor']) ? '':$request->cuerpo[24]['valor'],
-                "check_26"  =>empty($request->cuerpo[25]['valor']) ? '':$request->cuerpo[25]['valor'],
-                "check_27"  =>empty($request->cuerpo[26]['valor']) ? '':$request->cuerpo[26]['valor'],
-                "check_28"  =>empty($request->cuerpo[27]['valor']) ? '':$request->cuerpo[27]['valor'],
-                "check_29"  =>empty($request->cuerpo[28]['valor']) ? '':$request->cuerpo[28]['valor'],
-                "check_30"  =>empty($request->cuerpo[29]['valor']) ? '':$request->cuerpo[29]['valor'],
-                "check_31"  =>empty($request->cuerpo[30]['valor']) ? '':$request->cuerpo[30]['valor'],
-                "check_32"  =>empty($request->cuerpo[31]['valor']) ? '':$request->cuerpo[31]['valor'],
-                "check_33"  =>empty($request->cuerpo[32]['valor']) ? '':$request->cuerpo[32]['valor'],
-                "check_34"  =>empty($request->cuerpo[33]['valor']) ? '':$request->cuerpo[33]['valor'],
-                "check_35"  =>empty($request->cuerpo[34]['valor']) ? '':$request->cuerpo[34]['valor'],
-                "check_36"  =>empty($request->cuerpo[35]['valor']) ? '':$request->cuerpo[35]['valor'],
-                "check_37"  =>empty($request->cuerpo[36]['valor']) ? '':$request->cuerpo[36]['valor'],
-                "check_38"  =>empty($request->cuerpo[37]['valor']) ? '':$request->cuerpo[37]['valor'],
-                "check_39"  =>empty($request->cuerpo[38]['valor']) ? '':$request->cuerpo[38]['valor'],
-                "check_40"  =>empty($request->cuerpo[39]['valor']) ? '':$request->cuerpo[39]['valor'],
-                "check_41"  =>empty($request->cuerpo[40]['valor']) ? '':$request->cuerpo[40]['valor'],
-                "check_42"  =>empty($request->cuerpo[41]['valor']) ? '':$request->cuerpo[41]['valor'],
-                "check_43"  =>empty($request->cuerpo[42]['valor']) ? '':$request->cuerpo[42]['valor'],
-                "check_44"  =>empty($request->cuerpo[43]['valor']) ? '':$request->cuerpo[43]['valor'],
-                "check_45"  =>empty($request->cuerpo[44]['valor'])? '': $request->cuerpo[44]['valor'],
-                "check_46"  =>empty($request->cuerpo[45]['valor'])? '': $request->cuerpo[45]['valor'],
-                "check_47"  =>empty($request->cuerpo[46]['valor'])? '': $request->cuerpo[46]['valor'],
-                "check_48"  =>empty($request->cuerpo[47]['valor'])? '': $request->cuerpo[47]['valor'],
-                "check_49"  =>empty($request->cuerpo[48]['valor'])? '': $request->cuerpo[48]['valor'],
-                "check_50"  =>empty($request->cuerpo[49]['valor'])? '': $request->cuerpo[49]['valor'],
-                "check_51"  =>empty($request->cuerpo[50]['valor'])? '': $request->cuerpo[50]['valor'],
-                "check_52"  =>empty($request->cuerpo[51]['valor'])? '': $request->cuerpo[51]['valor'],
-                "check_53"  =>empty($request->cuerpo[52]['valor'])? '': $request->cuerpo[52]['valor'],
-                "check_54"  =>empty($request->cuerpo[53]['valor'])? '': $request->cuerpo[53]['valor'],
-                "check_55"  =>empty($request->cuerpo[54]['valor'])? '': $request->cuerpo[54]['valor'],
-                "check_56"  =>empty($request->cuerpo[55]['valor'])? '': $request->cuerpo[55]['valor'],
-                "check_57"  =>empty($request->cuerpo[56]['valor'])? '': $request->cuerpo[56]['valor'],
-                "check_58"  =>empty($request->cuerpo[57]['valor'])? '': $request->cuerpo[57]['valor'],
-                "check_59"  =>empty($request->cuerpo[58]['valor'])? '': $request->cuerpo[58]['valor'],
-                "check_60"  =>empty($request->cuerpo[59]['valor'])? '': $request->cuerpo[59]['valor'],
-                "check_61"  =>empty($request->cuerpo[60]['valor'])? '': $request->cuerpo[60]['valor'],
-                "check_62"  =>empty($request->cuerpo[61]['valor'])? '': $request->cuerpo[61]['valor'],
-                "check_63"  =>empty($request->cuerpo[62]['valor'])?'':$request->cuerpo[62]['valor']
-            ];
-    
+
+            $data2 = [ "checklis_usuario_id"=> $request->cabecera['usuario_id'],
+            "checklist_equipo"=> $request->cabecera['equipo_id'] ,
+            "checklist_fecha_hora"=> $request->cabecera['fecha'] ,
+            "checklist_kilom_inicial"=> $request->cabecera['equipo_kminicial'] ,
+            "checklist_kilom_final"=> $request->cabecera['equipo_kmfinal'] ,
+            "checklist_turno"=> $request->cabecera['turno'] ,
+            "checklist_autorizado" => false,
+            "checklist_usuario_id_autoriza"=> '',
+            "checklist_estado" => true];
+
+            $i=1;
+            foreach ($request->cuerpo as $value) {
+                $data2["check_".$i] = $value['valor'];
+               $i++; 
+            }
+
             DB::beginTransaction();
             try {
     
                 $id = DB::table('checklist')
-                ->insertGetId($data);
+                ->insertGetId($data2);
                 // $correlativo =DB::table('ventas')
                 //                 ->select('venta_correlativo')
                 //                 ->where('ventas_id','=',$id)
@@ -347,7 +401,7 @@ class Checklist_controller extends Controller
             $response["id"] = $id;
                
             return $response;
-            // return $request;
+            //  return $data2;
     }
     public function asignar_transportista(Request $request){
         $data_transp =[
