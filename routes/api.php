@@ -13,6 +13,8 @@ Use App\Http\Controllers\Preguntas_controller;
 Use App\Http\Controllers\Inventarios_controller;
 Use App\Http\Controllers\Checklist_controller;
 
+use App\Http\Middleware\prueba1;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes

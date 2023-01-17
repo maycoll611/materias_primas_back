@@ -78,15 +78,20 @@ class Checklist_controller extends Controller
                 "equipos.equipo_año",
                 "equipos.equipo_tipo",
                 "equipos.equipo_categoria_id");
-        
-        
-      
         $resp=$resp->where('checklist.checklist_id',$request->checklist_id);
-        
         $resp = $resp->get();
-        $resp1 = [];
 
-        return json_decode($resp);
+        if($resp[0]->checklist_usuario_id_autoriza){
+            $resp1 = DB::table('checklist')
+            ->join('equipos','checklist.checklist_equipo','=','equipos.equipo_id')
+            ->join('usuarios','checklist.checklist_usuario_id_autoriza','=','usuarios.usuario_id')
+            ->select('usuarios.usuario_detalle_nombre as autorizador');
+            $resp1=$resp1->where('checklist.checklist_id',$request->checklist_id);
+            $resp1= $resp1->get();
+            $resp[0]->usuario_autoriza = $resp1[0]->autorizador;
+        }
+        $resp[0]->usuario_autoriza = "";
+        return $resp;
     }
     public function get_checklist_vacio(Request $request){
         $resp = DB::table('elementos_checklist')
@@ -120,7 +125,8 @@ class Checklist_controller extends Controller
                 "equipos.equipo_descripcion",
                 "equipos.equipo_placa",
                 "equipos.equipo_tipo",
-                "equipos.equipo_ubicacion")
+                "equipos.equipo_ubicacion",
+                "usuarios.usuario_area")
         ->orderBy('checklist.checklist_id', 'desc');
         
         if(isset($request->desde)&&isset($request->hasta)){
